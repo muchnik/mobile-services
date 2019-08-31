@@ -1,0 +1,40 @@
+<configuration>
+
+    <property name="LOG_PATH" value="logs/mobile-services.log"/>
+    <property name="PATTERN" value="%-30([%d] [%thread]) %-5level %logger{32} - %msg%n"/>
+
+    <appender name="FILE" class="ch.qos.logback.core.rolling.RollingFileAppender">
+        <file>${LOG_PATH}</file>
+
+        <rollingPolicy class="ch.qos.logback.core.rolling.SizeAndTimeBasedRollingPolicy">
+            <fileNamePattern>logs/archived/app.%d{yyyy-MM-dd}.%i.log.gz</fileNamePattern>
+            <!-- максимальный размер одного файла логов -->
+            <maxFileSize>512MB</maxFileSize>
+            <!-- суммарный размер архивных файлов -->
+            <totalSizeCap>1GB</totalSizeCap>
+            <!-- Дней для хранения -->
+            <maxHistory>14</maxHistory>
+        </rollingPolicy>
+
+        <encoder>
+            <pattern>${PATTERN}</pattern>
+        </encoder>
+    </appender>
+
+    <appender name="STDOUT" class="ch.qos.logback.core.ConsoleAppender">
+        <encoder>
+            <pattern>${PATTERN}</pattern>
+        </encoder>
+    </appender>
+
+    <logger name="ru.muchnik.yota.mobileservices" level="trace" additivity="false">
+        <appender-ref ref="STDOUT"/>
+        <appender-ref ref="FILE"/>
+    </logger>
+
+    <root level="error">
+        <appender-ref ref="STDOUT"/>
+        <appender-ref ref="FILE"/>
+    </root>
+
+</configuration>
