@@ -12,12 +12,13 @@ import org.springframework.http.HttpStatus;
 import org.springframework.http.MediaType;
 import org.springframework.test.context.junit4.SpringRunner;
 import org.springframework.test.web.servlet.MockMvc;
-import ru.muchnik.yota.mobileservices.controller.PackageOfMinutesController;
+import ru.muchnik.yota.mobileservices.controller.MinutesPackageController;
 import ru.muchnik.yota.mobileservices.model.ErrorResponse;
 import ru.muchnik.yota.mobileservices.model.exception.NotFoundException;
 import ru.muchnik.yota.mobileservices.model.exception.ValidationException;
-import ru.muchnik.yota.mobileservices.service.MinutesPackageDetailsService;
-import ru.muchnik.yota.mobileservices.service.PackageOfMinutesService;
+import ru.muchnik.yota.mobileservices.service.BaseDetailsService;
+import ru.muchnik.yota.mobileservices.service.minutes.MinutesDetailsService;
+import ru.muchnik.yota.mobileservices.service.minutes.MinutesPackageService;
 
 import static org.mockito.ArgumentMatchers.eq;
 import static org.mockito.Mockito.when;
@@ -26,7 +27,7 @@ import static org.springframework.test.web.servlet.result.MockMvcResultHandlers.
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.*;
 
 @RunWith(SpringRunner.class)
-@WebMvcTest({GlobalControllerExceptionHandler.class, PackageOfMinutesController.class})
+@WebMvcTest({GlobalControllerExceptionHandler.class, MinutesPackageController.class})
 @AutoConfigureMockMvc
 public class GlobalControllerExceptionHandlerContextTest {
     private final ObjectMapper mapper = new ObjectMapper();
@@ -35,13 +36,13 @@ public class GlobalControllerExceptionHandlerContextTest {
     @MockBean
     private CommandLineRunner runner; // mocking because of this bean is executed when application starts
     @MockBean
-    private PackageOfMinutesService packageService;
+    private MinutesPackageService packageService;
     @MockBean
-    private MinutesPackageDetailsService detailsService;
+    private MinutesDetailsService detailsService;
 
     @Test
     public void handleRuntimeException() throws Exception {
-        when(packageService.getPackage(eq(1L))).thenThrow(new RuntimeException("error"));
+        when(packageService.getPackage(eq("1"))).thenThrow(new RuntimeException("error"));
 
         ErrorResponse response = ErrorResponse.builder()
                 .cause("error")
@@ -49,7 +50,7 @@ public class GlobalControllerExceptionHandlerContextTest {
                 .status(HttpStatus.INTERNAL_SERVER_ERROR)
                 .build();
 
-        mockMvc.perform(get("/api/v1/package-of-minutes/1").contentType(MediaType.APPLICATION_JSON_UTF8_VALUE))
+        mockMvc.perform(get("/api/v1/packages-of-minutes/1").contentType(MediaType.APPLICATION_JSON_UTF8_VALUE))
                 .andDo(print())
                 .andExpect(status().isInternalServerError())
                 .andExpect(header().string("Content-Type", MediaType.APPLICATION_JSON_UTF8_VALUE))
@@ -75,7 +76,7 @@ public class GlobalControllerExceptionHandlerContextTest {
 
     @Test
     public void handleNotFoundException() throws Exception {
-        when(packageService.getPackage(eq(1L))).thenThrow(new NotFoundException("error"));
+        when(packageService.getPackage(eq("1"))).thenThrow(new NotFoundException("error"));
 
         ErrorResponse response = ErrorResponse.builder()
                 .cause("error")
@@ -83,7 +84,7 @@ public class GlobalControllerExceptionHandlerContextTest {
                 .status(HttpStatus.NOT_FOUND)
                 .build();
 
-        mockMvc.perform(get("/api/v1/package-of-minutes/1").contentType(MediaType.APPLICATION_JSON_UTF8_VALUE))
+        mockMvc.perform(get("/api/v1/packages-of-minutes/1").contentType(MediaType.APPLICATION_JSON_UTF8_VALUE))
                 .andDo(print())
                 .andExpect(status().isNotFound())
                 .andExpect(header().string("Content-Type", MediaType.APPLICATION_JSON_UTF8_VALUE))
@@ -93,7 +94,7 @@ public class GlobalControllerExceptionHandlerContextTest {
 
     @Test
     public void handleValidationException() throws Exception {
-        when(packageService.getPackage(eq(1L))).thenThrow(new ValidationException("error"));
+        when(packageService.getPackage(eq("1"))).thenThrow(new ValidationException("error"));
 
         ErrorResponse response = ErrorResponse.builder()
                 .cause("error")
@@ -101,7 +102,7 @@ public class GlobalControllerExceptionHandlerContextTest {
                 .status(HttpStatus.INTERNAL_SERVER_ERROR)
                 .build();
 
-        mockMvc.perform(get("/api/v1/package-of-minutes/1").contentType(MediaType.APPLICATION_JSON_UTF8_VALUE))
+        mockMvc.perform(get("/api/v1/packages-of-minutes/1").contentType(MediaType.APPLICATION_JSON_UTF8_VALUE))
                 .andDo(print())
                 .andExpect(status().isInternalServerError())
                 .andExpect(header().string("Content-Type", MediaType.APPLICATION_JSON_UTF8_VALUE))

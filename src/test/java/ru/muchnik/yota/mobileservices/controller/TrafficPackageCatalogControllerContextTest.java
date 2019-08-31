@@ -14,9 +14,10 @@ import org.springframework.boot.test.mock.mockito.MockBean;
 import org.springframework.http.MediaType;
 import org.springframework.test.context.junit4.SpringRunner;
 import org.springframework.test.web.servlet.MockMvc;
-import ru.muchnik.yota.mobileservices.model.entity.PackageOfMinutes;
-import ru.muchnik.yota.mobileservices.service.MinutesPackageDetailsService;
-import ru.muchnik.yota.mobileservices.service.PackageOfMinutesService;
+import ru.muchnik.yota.mobileservices.model.entity.minutes.MinutesPackageCatalog;
+import ru.muchnik.yota.mobileservices.model.entity.traffic.TrafficPackageCatalog;
+import ru.muchnik.yota.mobileservices.service.traffic.TrafficDetailsService;
+import ru.muchnik.yota.mobileservices.service.traffic.TrafficPackageService;
 
 import static org.mockito.ArgumentMatchers.any;
 import static org.mockito.ArgumentMatchers.eq;
@@ -27,67 +28,67 @@ import static org.springframework.test.web.servlet.result.MockMvcResultHandlers.
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.*;
 
 @RunWith(SpringRunner.class)
-@WebMvcTest(PackageOfMinutesController.class)
+@WebMvcTest(TrafficPackageController.class)
 @AutoConfigureMockMvc
-public class PackageOfMinutesControllerContextTest {
+public class TrafficPackageCatalogControllerContextTest {
     private final ObjectMapper mapper = new ObjectMapper();
     @Autowired
     private MockMvc mockMvc;
     @MockBean
     private CommandLineRunner runner; // mocking because of this bean is executed when application starts
     @MockBean
-    private PackageOfMinutesService packageService;
+    private TrafficPackageService packageService;
     @MockBean
-    private MinutesPackageDetailsService detailsService;
-    private PackageOfMinutes packageOfMinutes = new PackageOfMinutes();
+    private TrafficDetailsService detailsService;
+    private TrafficPackageCatalog trafficPackageCatalog = new TrafficPackageCatalog();
     @Captor
-    private ArgumentCaptor<PackageOfMinutes> captor;
+    private ArgumentCaptor<TrafficPackageCatalog> captor;
 
     @Test
     public void getPackage() throws Exception {
-        when(packageService.getPackage(eq(1L))).thenReturn(packageOfMinutes);
+        when(packageService.getPackage(eq("1"))).thenReturn(trafficPackageCatalog);
 
-        mockMvc.perform(get("/api/v1/package-of-minutes/1").contentType(MediaType.APPLICATION_JSON_UTF8_VALUE))
+        mockMvc.perform(get("/api/v1/traffic-packages/1").contentType(MediaType.APPLICATION_JSON_UTF8_VALUE))
                 .andDo(print())
                 .andExpect(status().isOk())
                 .andExpect(header().string("Content-Type", MediaType.APPLICATION_JSON_UTF8_VALUE))
                 .andExpect(content().contentType(MediaType.APPLICATION_JSON_UTF8_VALUE))
-                .andExpect(content().json(mapper.writeValueAsString(packageOfMinutes)));
+                .andExpect(content().json(mapper.writeValueAsString(trafficPackageCatalog)));
 
     }
 
     @Test
     public void savePackage() throws Exception {
-        PackageOfMinutes mp = PackageOfMinutes.builder()
+        TrafficPackageCatalog mp = TrafficPackageCatalog.builder()
                 .name("name")
-                .type(PackageOfMinutes.PackageOfMinutesType.FAVORITE_NUMBER)
+                .type(TrafficPackageCatalog.TrafficPackageType.YOUTUBE)
                 .build();
         when(packageService.savePackage(any())).thenReturn(mp);
 
-        mockMvc.perform(post("/api/v1/package-of-minutes/")
+        mockMvc.perform(post("/api/v1/traffic-packages/")
                 .contentType(MediaType.APPLICATION_JSON_UTF8_VALUE)
-                .content("{\"name\": \"name\", \"type\": \"FAVORITE_NUMBER\"}"))
+                .content("{\"name\": \"name\", \"type\": \"YOUTUBE\"}"))
                 .andDo(print())
                 .andExpect(status().isCreated())
                 .andExpect(header().string("Content-Type", MediaType.APPLICATION_JSON_UTF8_VALUE))
-                .andExpect(header().string("Location", "/api/v1/package-of-minutes/" + mp.getId()))
+                .andExpect(header().string("Location", "/api/v1/traffic-packages/" + mp.getId()))
                 .andExpect(content().contentType(MediaType.APPLICATION_JSON_UTF8_VALUE))
                 .andExpect(content().json(mapper.writeValueAsString(mp)));
 
         verify(packageService).savePackage(captor.capture());
-        PackageOfMinutes captorValue = captor.getValue();
+        TrafficPackageCatalog captorValue = captor.getValue();
         Assert.assertEquals("name", captorValue.getName());
-        Assert.assertEquals(PackageOfMinutes.PackageOfMinutesType.FAVORITE_NUMBER, captorValue.getType());
+        Assert.assertEquals(TrafficPackageCatalog.TrafficPackageType.YOUTUBE, captorValue.getType());
     }
 
     @Test
     public void updateMinutes() throws Exception {
-        mockMvc.perform(put("/api/v1/package-of-minutes/details/1")
+        mockMvc.perform(put("/api/v1/traffic-packages/details/1")
                 .contentType(MediaType.APPLICATION_JSON_UTF8_VALUE)
                 .content("{\"value\": 15}"))
                 .andDo(print())
                 .andExpect(status().isOk());
 
-        verify(detailsService).updateMinutes(eq(1L), eq(15));
+        verify(detailsService).updateAmount(eq("1"), eq(15));
     }
 }

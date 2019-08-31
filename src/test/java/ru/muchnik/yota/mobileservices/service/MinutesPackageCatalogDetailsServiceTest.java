@@ -7,10 +7,11 @@ import org.junit.runner.RunWith;
 import org.mockito.InjectMocks;
 import org.mockito.Mock;
 import org.mockito.junit.MockitoJUnitRunner;
-import ru.muchnik.yota.mobileservices.model.entity.MinutesPackageDetails;
+import ru.muchnik.yota.mobileservices.model.entity.minutes.MinutesDetails;
 import ru.muchnik.yota.mobileservices.model.exception.NotFoundException;
 import ru.muchnik.yota.mobileservices.model.exception.ValidationException;
-import ru.muchnik.yota.mobileservices.repository.MinutesPackageDetailsRepository;
+import ru.muchnik.yota.mobileservices.repository.minutes.MinutesDetailsRepository;
+import ru.muchnik.yota.mobileservices.service.minutes.MinutesDetailsService;
 
 import java.time.LocalDateTime;
 import java.util.Collections;
@@ -21,16 +22,16 @@ import static org.mockito.ArgumentMatchers.eq;
 import static org.mockito.Mockito.*;
 
 @RunWith(MockitoJUnitRunner.class)
-public class PackageOfMinutesDetailsServiceTest {
+public class MinutesPackageCatalogDetailsServiceTest {
     @Mock
-    private MinutesPackageDetailsRepository repository;
+    private MinutesDetailsRepository repository;
 
     @InjectMocks
-    private MinutesPackageDetailsService service;
+    private MinutesDetailsService service;
 
     @Mock
-    private MinutesPackageDetails details;
-    private Optional<MinutesPackageDetails> optionalMinutesPackageDetails;
+    private MinutesDetails details;
+    private Optional<MinutesDetails> optionalMinutesPackageDetails;
 
     @Before
     public void setUp() throws Exception {
@@ -39,71 +40,71 @@ public class PackageOfMinutesDetailsServiceTest {
 
     @Test
     public void getDetails() {
-        when(repository.findById(eq(1L))).thenReturn(optionalMinutesPackageDetails);
+        when(repository.findById(eq("1"))).thenReturn(optionalMinutesPackageDetails);
 
-        MinutesPackageDetails result = service.getDetails(1L);
+        MinutesDetails result = service.getDetails("1");
 
         Assert.assertEquals(details, result);
     }
 
     @Test(expected = NotFoundException.class)
     public void getDetailsNotFound() {
-        when(repository.findById(eq(1L))).thenReturn(Optional.empty());
+        when(repository.findById(eq("1"))).thenReturn(Optional.empty());
 
-        MinutesPackageDetails result = service.getDetails(1L);
+        MinutesDetails result = service.getDetails("1");
     }
 
     @Test
     public void updateMinutesAdding() {
-        when(repository.findById(eq(1L))).thenReturn(optionalMinutesPackageDetails);
+        when(repository.findById(eq("1"))).thenReturn(optionalMinutesPackageDetails);
 
         // validation
-        when(details.getMinutesLeft()).thenReturn(10);
+        when(details.getAmountLeft()).thenReturn(10);
         when(details.getActivationDate()).thenReturn(LocalDateTime.now().minusDays(1));
         when(details.getExpirationDate()).thenReturn(LocalDateTime.now().plusDays(1));
 
-        service.updateMinutes(1L, 5);
+        service.updateAmount("1", 5);
 
-        verify(details).setMinutesLeft(eq(15));
+        verify(details).setAmountLeft(eq(15));
     }
 
     @Test
     public void updateMinutesDecrement() {
-        when(repository.findById(eq(1L))).thenReturn(optionalMinutesPackageDetails);
+        when(repository.findById(eq("1"))).thenReturn(optionalMinutesPackageDetails);
 
         // validation
-        when(details.getMinutesLeft()).thenReturn(10);
+        when(details.getAmountLeft()).thenReturn(10);
         when(details.getActivationDate()).thenReturn(LocalDateTime.now().minusDays(1));
         when(details.getExpirationDate()).thenReturn(LocalDateTime.now().plusDays(1));
 
-        service.updateMinutes(1L, -5);
+        service.updateAmount("1", -5);
 
-        verify(details).setMinutesLeft(eq(5));
+        verify(details).setAmountLeft(eq(5));
     }
 
     @Test(expected = ValidationException.class)
     public void updateMinutesAddingButExpired() {
-        when(repository.findById(eq(1L))).thenReturn(optionalMinutesPackageDetails);
+        when(repository.findById(eq("1"))).thenReturn(optionalMinutesPackageDetails);
 
         // validation
         when(details.getActivationDate()).thenReturn(LocalDateTime.now().minusDays(2));
         when(details.getExpirationDate()).thenReturn(LocalDateTime.now().minusDays(1));
 
-        service.updateMinutes(1L, 5);
+        service.updateAmount("1", 5);
 
         verify(details, times(0)).setMinutesLeft(anyInt());
     }
 
     @Test(expected = ValidationException.class)
     public void updateMinutesDecrementException() {
-        when(repository.findById(eq(1L))).thenReturn(optionalMinutesPackageDetails);
+        when(repository.findById(eq("1"))).thenReturn(optionalMinutesPackageDetails);
 
         // validation
-        when(details.getMinutesLeft()).thenReturn(10);
+        when(details.getAmountLeft()).thenReturn(10);
         when(details.getActivationDate()).thenReturn(LocalDateTime.now().minusDays(1));
         when(details.getExpirationDate()).thenReturn(LocalDateTime.now().plusDays(1));
 
-        service.updateMinutes(1L, -15);
+        service.updateAmount("1", -15);
 
         verify(details, times(0)).setMinutesLeft(anyInt());
     }
@@ -112,7 +113,7 @@ public class PackageOfMinutesDetailsServiceTest {
     public void getAllActivePackages() {
         when(repository.findAllActive(eq("89992223344"), any(LocalDateTime.class))).thenReturn(Collections.singletonList(details));
 
-        List<MinutesPackageDetails> result = service.getAllActivePackages("89992223344");
+        List<MinutesDetails> result = service.getAllActivePackages("89992223344");
 
         verify(repository).findAllActive(eq("89992223344"), any(LocalDateTime.class));
         Assert.assertEquals(Collections.singletonList(details), result);

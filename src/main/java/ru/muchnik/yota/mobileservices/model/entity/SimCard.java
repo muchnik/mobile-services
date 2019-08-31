@@ -1,7 +1,9 @@
 package ru.muchnik.yota.mobileservices.model.entity;
 
-import com.fasterxml.jackson.annotation.JsonBackReference;
+import com.fasterxml.jackson.annotation.JsonIgnore;
 import lombok.*;
+import ru.muchnik.yota.mobileservices.model.entity.minutes.MinutesDetails;
+import ru.muchnik.yota.mobileservices.model.entity.traffic.TrafficDetails;
 
 import javax.persistence.*;
 import javax.validation.constraints.NotBlank;
@@ -22,20 +24,33 @@ public class SimCard {
     @EqualsAndHashCode.Include
     @Size(max = 36)
     private final String id = UUID.randomUUID().toString();
+
     @Column(unique = true)
     @NotBlank
     @Size(max = 64)
     @Pattern(regexp = "[0-9]+")
     private String number;
+
     /**
      * Sim card can be in two statuses: active(true), deactivated(false)
      */
     private boolean isActive;
+
     /**
-     * All {@link MinutesPackageDetails} packages of minutes that is attached to this sim card
+     * All {@link MinutesDetails} packages of addition that is attached to this sim card
      */
     @OneToMany(cascade = CascadeType.ALL, orphanRemoval = true, mappedBy = "simCard", fetch = FetchType.LAZY)
     @NotNull
-    @JsonBackReference
-    private List<MinutesPackageDetails> minutesPackageDetails;
+    @JsonIgnore
+    @ToString.Exclude
+    private List<MinutesDetails> minutesDetails;
+
+    /**
+     * All {@link MinutesDetails} packages of addition that is attached to this sim card
+     */
+    @OneToMany(cascade = CascadeType.ALL, orphanRemoval = true, mappedBy = "simCard", fetch = FetchType.LAZY)
+    @NotNull
+    @JsonIgnore
+    @ToString.Exclude
+    private List<TrafficDetails> trafficDetails;
 }

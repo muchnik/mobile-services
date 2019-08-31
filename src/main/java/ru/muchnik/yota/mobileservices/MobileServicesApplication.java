@@ -4,13 +4,14 @@ import org.springframework.boot.CommandLineRunner;
 import org.springframework.boot.SpringApplication;
 import org.springframework.boot.autoconfigure.SpringBootApplication;
 import org.springframework.context.annotation.Bean;
-import org.springframework.context.annotation.EnableAspectJAutoProxy;
-import org.springframework.web.servlet.config.annotation.EnableWebMvc;
-import ru.muchnik.yota.mobileservices.model.entity.MinutesPackageDetails;
-import ru.muchnik.yota.mobileservices.model.entity.PackageOfMinutes;
+import ru.muchnik.yota.mobileservices.model.entity.minutes.MinutesPackageCatalog;
+import ru.muchnik.yota.mobileservices.model.entity.minutes.MinutesDetails;
 import ru.muchnik.yota.mobileservices.model.entity.SimCard;
-import ru.muchnik.yota.mobileservices.repository.PackageOfMinutesRepository;
+import ru.muchnik.yota.mobileservices.model.entity.traffic.TrafficDetails;
+import ru.muchnik.yota.mobileservices.model.entity.traffic.TrafficPackageCatalog;
+import ru.muchnik.yota.mobileservices.repository.minutes.MinutesPackageCatalogRepository;
 import ru.muchnik.yota.mobileservices.repository.SimCardRepository;
+import ru.muchnik.yota.mobileservices.repository.traffic.TrafficPackageCatalogRepository;
 
 import java.util.Arrays;
 
@@ -18,8 +19,6 @@ import java.util.Arrays;
  * Application entry point
  */
 @SpringBootApplication
-@EnableAspectJAutoProxy
-@EnableWebMvc
 public class MobileServicesApplication {
     public static void main(String[] args) {
         SpringApplication.run(MobileServicesApplication.class, args);
@@ -28,36 +27,51 @@ public class MobileServicesApplication {
     /**
      * Filling database with test data, when application starts
      *
-     * @apiNote <b>Just for testing purposes</b>
+     * @apiNote <b>Just for testing purposes as a part of test task</b>
      */
     @Bean
-    public CommandLineRunner runner(SimCardRepository simCardRepository, PackageOfMinutesRepository packageRepository) {
+    public CommandLineRunner runner(SimCardRepository simCardRepository, MinutesPackageCatalogRepository minutesRepository, TrafficPackageCatalogRepository trafficRepository) {
         return args -> {
-            PackageOfMinutes freeRoaming = PackageOfMinutes.builder()
+            MinutesPackageCatalog freeRoaming = MinutesPackageCatalog.builder()
                     .name("FreeRoaming")
-                    .type(PackageOfMinutes.PackageOfMinutesType.FREE_ROAMING)
+                    .type(MinutesPackageCatalog.MinutesPackageType.FREE_ROAMING)
                     .build();
 
-            PackageOfMinutes favoriteNumber = PackageOfMinutes.builder()
+            MinutesPackageCatalog favoriteNumber = MinutesPackageCatalog.builder()
                     .name("FavoriteNumber")
-                    .type(PackageOfMinutes.PackageOfMinutesType.FAVORITE_NUMBER)
+                    .type(MinutesPackageCatalog.MinutesPackageType.FAVORITE_NUMBER)
                     .build();
 
-            MinutesPackageDetails packageDetails = new MinutesPackageDetails(freeRoaming, 300, 30);
-            MinutesPackageDetails packageDetails2 = new MinutesPackageDetails(freeRoaming, 200, -1);
-            MinutesPackageDetails packageDetails3 = new MinutesPackageDetails(freeRoaming, 100, 1);
+            MinutesDetails packageDetails = new MinutesDetails(freeRoaming, 300, 30);
+            MinutesDetails packageDetails2 = new MinutesDetails(freeRoaming, 200, -1);
+            MinutesDetails packageDetails3 = new MinutesDetails(freeRoaming, 100, 1);
+
+            TrafficPackageCatalog trafficYoutube = TrafficPackageCatalog.builder()
+                    .name("Youtube")
+                    .type(TrafficPackageCatalog.TrafficPackageType.YOUTUBE)
+                    .build();
+
+            TrafficDetails trafficDetails = new TrafficDetails(trafficYoutube, 4, 2);
+            TrafficDetails expiredTraffic = new TrafficDetails(trafficYoutube, 5, -1);
+            TrafficDetails trafficDetails2 = new TrafficDetails(trafficYoutube, 6, 3);
 
             SimCard simCard = SimCard.builder()
                     .isActive(true)
                     .number("89998887766")
-                    .minutesPackageDetails(Arrays.asList(packageDetails, packageDetails2, packageDetails3))
+                    .minutesDetails(Arrays.asList(packageDetails, packageDetails2, packageDetails3))
+                    .trafficDetails(Arrays.asList(trafficDetails, expiredTraffic, trafficDetails2))
                     .build();
 
             packageDetails.setSimCard(simCard);
             packageDetails2.setSimCard(simCard);
             packageDetails3.setSimCard(simCard);
 
-            packageRepository.saveAll(Arrays.asList(favoriteNumber, freeRoaming));
+            trafficDetails.setSimCard(simCard);
+            expiredTraffic.setSimCard(simCard);
+            trafficDetails2.setSimCard(simCard);
+
+            minutesRepository.saveAll(Arrays.asList(favoriteNumber, freeRoaming));
+            trafficRepository.saveAll(Arrays.asList(trafficYoutube));
             simCardRepository.saveAndFlush(simCard);
         };
     }

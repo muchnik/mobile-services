@@ -5,12 +5,13 @@ import org.springframework.lang.NonNull;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Isolation;
 import org.springframework.transaction.annotation.Transactional;
-import ru.muchnik.yota.mobileservices.model.entity.MinutesPackageDetails;
-import ru.muchnik.yota.mobileservices.model.entity.PackageOfMinutes;
+import ru.muchnik.yota.mobileservices.model.entity.minutes.MinutesDetails;
+import ru.muchnik.yota.mobileservices.model.entity.minutes.MinutesPackageCatalog;
 import ru.muchnik.yota.mobileservices.model.entity.SimCard;
 import ru.muchnik.yota.mobileservices.model.exception.NotFoundException;
-import ru.muchnik.yota.mobileservices.repository.MinutesPackageDetailsRepository;
+import ru.muchnik.yota.mobileservices.repository.minutes.MinutesDetailsRepository;
 import ru.muchnik.yota.mobileservices.repository.SimCardRepository;
+import ru.muchnik.yota.mobileservices.service.minutes.MinutesPackageService;
 
 import java.util.Optional;
 
@@ -18,8 +19,7 @@ import java.util.Optional;
 @RequiredArgsConstructor
 public class SimCardService {
     private final SimCardRepository simCardRepository;
-    private final PackageOfMinutesService packageOfMinutesService;
-    private final MinutesPackageDetailsRepository detailsRepository;
+    private final MinutesPackageService minutesPackageService;
 
     @Transactional(readOnly = true, isolation = Isolation.READ_COMMITTED)
     public SimCard getSimCard(@NonNull final String number) {
@@ -34,28 +34,30 @@ public class SimCardService {
     }
 
     @Transactional(isolation = Isolation.READ_COMMITTED)
-    public boolean updateSimCardStatus(@NonNull final String number, final boolean status) {
-        return simCardRepository.updateStatus(number, status) > 0;
+    public SimCard updateSimCardStatus(@NonNull final String number, final boolean status) {
+        SimCard simCard = getSimCard(number);
+        simCard.setActive(status);
+        return simCard;
     }
 
     /**
-     * Adds a minutes package to specified sim card by number
+     * Adds a addition package to specified sim card by number
      *
      * @param number        target sim card number
      * @param basePackageId base package id
-     * @param minutes       minutes to add
+     * @param minutes       addition to add
      * @param daysToLive    days to live
      */
     @Transactional(isolation = Isolation.READ_COMMITTED)
-    public MinutesPackageDetails addPackageOfMinutesToSimCard(@NonNull final String number,
-                                                              final long basePackageId,
-                                                              final int minutes,
-                                                              final int daysToLive) {
+    public MinutesDetails addPackageOfMinutesToSimCard(@NonNull final String number,
+                                                       @NonNull final String basePackageId,
+                                                       final int minutes,
+                                                       final int daysToLive) {
         final SimCard simCard = getSimCard(number);
-        final PackageOfMinutes basePackage = packageOfMinutesService.getPackage(basePackageId);
-        final MinutesPackageDetails details = new MinutesPackageDetails(basePackage, minutes, daysToLive);
+        final MinutesPackageCatalog basePackage = minutesPackageService.getPackage(basePackageId);
+        final MinutesDetails details = new MinutesDetails(basePackage, minutes, daysToLive);
         details.setSimCard(simCard);
-        simCard.getMinutesPackageDetails().add(details);
-        return detailsRepository.save(details);
+        simCard.getMinutesDetails().add(details);
+        return details;
     }
 }

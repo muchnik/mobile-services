@@ -4,13 +4,11 @@ import lombok.AllArgsConstructor;
 import lombok.Data;
 import lombok.NoArgsConstructor;
 
-/**
- * Simple DTO for single value-container
- * @param <T>
- */
 @Data
 @AllArgsConstructor
 @NoArgsConstructor
-public class UnitDTO<T> {
-    private T value;
+public class UpdatePackageRequestDTO {
+    private String basePackageId;
+    private int addition;
+    private int daysToLive;
 }

@@ -5,12 +5,12 @@ import org.springframework.http.MediaType;
 import org.springframework.http.ResponseEntity;
 import org.springframework.stereotype.Controller;
 import org.springframework.web.bind.annotation.*;
-import ru.muchnik.yota.mobileservices.model.dto.UnitDTO;
-import ru.muchnik.yota.mobileservices.model.dto.request.AddMinutesToPackageOfMinutesRequestDTO;
-import ru.muchnik.yota.mobileservices.model.entity.MinutesPackageDetails;
+import ru.muchnik.yota.mobileservices.model.dto.UpdatePackageRequestDTO;
+import ru.muchnik.yota.mobileservices.model.dto.ValueDTO;
 import ru.muchnik.yota.mobileservices.model.entity.SimCard;
-import ru.muchnik.yota.mobileservices.service.MinutesPackageDetailsService;
+import ru.muchnik.yota.mobileservices.model.entity.minutes.MinutesDetails;
 import ru.muchnik.yota.mobileservices.service.SimCardService;
+import ru.muchnik.yota.mobileservices.service.minutes.MinutesDetailsService;
 
 import java.net.URI;
 import java.util.List;
@@ -20,7 +20,7 @@ import java.util.List;
 @RequestMapping(value = "api/v1/sim-card/", consumes = MediaType.APPLICATION_JSON_UTF8_VALUE, produces = MediaType.APPLICATION_JSON_UTF8_VALUE)
 public class SimCardController {
     private final SimCardService simCardService;
-    private final MinutesPackageDetailsService detailsService;
+    private final MinutesDetailsService detailsService;
 
     @GetMapping("{number}")
     public ResponseEntity<SimCard> getSimCard(@PathVariable String number) {
@@ -28,35 +28,34 @@ public class SimCardController {
     }
 
     @GetMapping("{number}/status")
-    public ResponseEntity<UnitDTO<Boolean>> getSimCardStatus(@PathVariable String number) {
-        return ResponseEntity.ok(new UnitDTO<>(simCardService.getSimCardStatus(number)));
+    public ResponseEntity<ValueDTO<Boolean>> getSimCardStatus(@PathVariable String number) {
+        return ResponseEntity.ok(new ValueDTO<>(simCardService.getSimCardStatus(number)));
     }
 
     @PutMapping("{number}/status")
-    public ResponseEntity<UnitDTO<Boolean>> updateSimCardStatus(@PathVariable String number,
-                                                                @RequestBody UnitDTO<Boolean> statusDTO) {
-        boolean updated = simCardService.updateSimCardStatus(number, statusDTO.getValue());
-        return ResponseEntity.ok(new UnitDTO<>(updated));
+    public ResponseEntity<SimCard> updateSimCardStatus(@PathVariable String number,
+                                                                @RequestBody ValueDTO<Boolean> statusDTO) {
+        return ResponseEntity.ok(simCardService.updateSimCardStatus(number, statusDTO.getValue()));
     }
 
     @GetMapping("{number}/minutes/total")
-    public ResponseEntity<UnitDTO<Integer>> getSimCardActiveMinutesTotal(@PathVariable String number) {
+    public ResponseEntity<ValueDTO<Integer>> getSimCardActiveMinutesTotal(@PathVariable String number) {
         int sumOfMinutesLeft = detailsService.getAllActivePackages(number).stream()
-                .mapToInt(MinutesPackageDetails::getMinutesLeft)
+                .mapToInt(MinutesDetails::getMinutesLeft)
                 .sum();
-        return ResponseEntity.ok(new UnitDTO<>(sumOfMinutesLeft));
+        return ResponseEntity.ok(new ValueDTO<>(sumOfMinutesLeft));
     }
 
     @GetMapping("{number}/minutes/packages")
-    public ResponseEntity<List<MinutesPackageDetails>> getSimCardActivePackagesOfMinutes(@PathVariable String number) {
+    public ResponseEntity<List<MinutesDetails>> getSimCardActivePackagesOfMinutes(@PathVariable String number) {
         return ResponseEntity.ok(detailsService.getAllActivePackages(number));
     }
 
     @PostMapping("{number}/minutes")
-    public ResponseEntity<MinutesPackageDetails> addPackageOfMinutesToSimCard(@PathVariable String number,
-                                                                              @RequestBody AddMinutesToPackageOfMinutesRequestDTO requestDTO) {
-        MinutesPackageDetails savedDetails = simCardService.addPackageOfMinutesToSimCard(number, requestDTO.getBasePackageId(), requestDTO.getMinutes(), requestDTO.getDaysToLive());
-        return ResponseEntity.created(URI.create("/api/v1/package-of-minutes/" + savedDetails.getId()))
+    public ResponseEntity<MinutesDetails> addPackageOfMinutesToSimCard(@PathVariable String number,
+                                                                       @RequestBody UpdatePackageRequestDTO requestDTO) {
+        MinutesDetails savedDetails = simCardService.addPackageOfMinutesToSimCard(number, requestDTO.getBasePackageId(), requestDTO.getAddition(), requestDTO.getDaysToLive());
+        return ResponseEntity.created(URI.create("/api/v1/packages-of-addition/" + savedDetails.getId()))
                 .body(savedDetails);
     }
 }

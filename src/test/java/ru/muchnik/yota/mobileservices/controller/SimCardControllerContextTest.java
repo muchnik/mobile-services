@@ -1,6 +1,10 @@
 package ru.muchnik.yota.mobileservices.controller;
 
+import com.fasterxml.jackson.core.type.TypeReference;
 import com.fasterxml.jackson.databind.ObjectMapper;
+import com.fasterxml.jackson.datatype.jsr310.JavaTimeModule;
+import org.junit.Assert;
+import org.junit.Before;
 import org.junit.Test;
 import org.junit.runner.RunWith;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -14,13 +18,14 @@ import org.springframework.test.context.junit4.SpringRunner;
 import org.springframework.test.web.servlet.MockMvc;
 import org.springframework.test.web.servlet.MvcResult;
 import ru.muchnik.yota.mobileservices.model.ErrorResponse;
-import ru.muchnik.yota.mobileservices.model.dto.UnitDTO;
-import ru.muchnik.yota.mobileservices.model.entity.MinutesPackageDetails;
-import ru.muchnik.yota.mobileservices.model.entity.PackageOfMinutes;
+import ru.muchnik.yota.mobileservices.model.dto.ValueDTO;
+import ru.muchnik.yota.mobileservices.model.entity.minutes.MinutesPackageCatalog;
+import ru.muchnik.yota.mobileservices.model.entity.minutes.MinutesDetails;
 import ru.muchnik.yota.mobileservices.model.entity.SimCard;
 import ru.muchnik.yota.mobileservices.model.exception.NotFoundException;
-import ru.muchnik.yota.mobileservices.service.MinutesPackageDetailsService;
+import ru.muchnik.yota.mobileservices.service.BaseDetailsService;
 import ru.muchnik.yota.mobileservices.service.SimCardService;
+import ru.muchnik.yota.mobileservices.service.minutes.MinutesDetailsService;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -46,10 +51,15 @@ public class SimCardControllerContextTest {
     private SimCardService simCardService;
 
     @MockBean
-    private MinutesPackageDetailsService detailsService;
+    private MinutesDetailsService detailsService;
 
     private SimCard simCard = new SimCard();
     private ObjectMapper mapper = new ObjectMapper();
+
+    @Before
+    public void setUp() throws Exception {
+        mapper.registerModule(new JavaTimeModule());
+    }
 
     @Test
     public void getSimCard() throws Exception {
@@ -82,7 +92,7 @@ public class SimCardControllerContextTest {
 
     @Test
     public void getSimCardStatus() throws Exception {
-        UnitDTO<Boolean> dto = new UnitDTO<>(true);
+        ValueDTO<Boolean> dto = new ValueDTO<>(true);
         when(simCardService.getSimCardStatus(eq("1"))).thenReturn(true);
 
         mockMvc.perform(get("/api/v1/sim-card/1/status").contentType(MediaType.APPLICATION_JSON_UTF8_VALUE))
@@ -95,8 +105,7 @@ public class SimCardControllerContextTest {
 
     @Test
     public void updateSimCardStatus() throws Exception {
-        UnitDTO<Boolean> dto = new UnitDTO<>(true);
-        when(simCardService.updateSimCardStatus(eq("1"), eq(true))).thenReturn(true);
+        when(simCardService.updateSimCardStatus(eq("1"), eq(true))).thenReturn(simCard);
 
         mockMvc.perform(put("/api/v1/sim-card/1/status")
                 .contentType(MediaType.APPLICATION_JSON_UTF8_VALUE)
@@ -105,21 +114,21 @@ public class SimCardControllerContextTest {
                 .andExpect(status().isOk())
                 .andExpect(header().string("Content-Type", MediaType.APPLICATION_JSON_UTF8_VALUE))
                 .andExpect(content().contentType(MediaType.APPLICATION_JSON_UTF8_VALUE))
-                .andExpect(content().json(mapper.writeValueAsString(dto)));
+                .andExpect(content().json(mapper.writeValueAsString(simCard)));
 
         verify(simCardService).updateSimCardStatus(eq("1"), eq(true));
     }
 
     @Test
     public void getSimCardActiveMinutesTotal() throws Exception {
-        UnitDTO<Integer> dto = new UnitDTO<>(22);
-        PackageOfMinutes pof = PackageOfMinutes.builder()
+        ValueDTO<Integer> dto = new ValueDTO<>(22);
+        MinutesPackageCatalog pof = MinutesPackageCatalog.builder()
                 .name("name")
-                .type(PackageOfMinutes.PackageOfMinutesType.FAVORITE_NUMBER)
+                .type(MinutesPackageCatalog.MinutesPackageType.FAVORITE_NUMBER)
                 .build();
-        MinutesPackageDetails details = new MinutesPackageDetails(pof, 10, 15);
-        MinutesPackageDetails details2 = new MinutesPackageDetails(pof, 12, 17);
-        List<MinutesPackageDetails> list = new ArrayList<>();
+        MinutesDetails details = new MinutesDetails(pof, 10, 15);
+        MinutesDetails details2 = new MinutesDetails(pof, 12, 17);
+        List<MinutesDetails> list = new ArrayList<>();
         list.add(details);
         list.add(details2);
 
@@ -136,15 +145,15 @@ public class SimCardControllerContextTest {
 
     @Test
     public void getSimCardActivePackagesOfMinutes() throws Exception {
-        PackageOfMinutes pof = PackageOfMinutes.builder()
+        MinutesPackageCatalog pof = MinutesPackageCatalog.builder()
                 .name("name")
-                .type(PackageOfMinutes.PackageOfMinutesType.FAVORITE_NUMBER)
+                .type(MinutesPackageCatalog.MinutesPackageType.FAVORITE_NUMBER)
                 .build();
-        MinutesPackageDetails details = new MinutesPackageDetails(pof, 10, 15);
-        MinutesPackageDetails details2 = new MinutesPackageDetails(pof, 12, 17);
+        MinutesDetails details = new MinutesDetails(pof, 10, 15);
+        MinutesDetails details2 = new MinutesDetails(pof, 12, 17);
         details.setSimCard(simCard);
         details2.setSimCard(simCard);
-        List<MinutesPackageDetails> list = new ArrayList<>();
+        List<MinutesDetails> list = new ArrayList<>();
         list.add(details);
         list.add(details2);
 
@@ -158,30 +167,28 @@ public class SimCardControllerContextTest {
                 .andExpect(content().contentType(MediaType.APPLICATION_JSON_UTF8_VALUE))
                 .andReturn();
         String content = result.getResponse().getContentAsString();
-//        List<MinutesPackageDetails> resultContent = mapper.readValue(content, new TypeReference<List<MinutesPackageDetails>>() {});
-//        Assert.assertEquals(details, resultContent.get(0));
-//        Assert.assertEquals(details2, resultContent.get(1));
-        // todo
+        List<MinutesDetails> resultContent = mapper.readValue(content, new TypeReference<List<MinutesDetails>>() {});
+        Assert.assertEquals(list, resultContent);
     }
 
     @Test
     public void addPackageOfMinutesToSimCard() throws Exception {
-        MinutesPackageDetails details = new MinutesPackageDetails();
+        MinutesDetails details = new MinutesDetails();
 
-        when(simCardService.addPackageOfMinutesToSimCard(eq("1"), anyLong(), anyInt(), anyInt()))
+        when(simCardService.addPackageOfMinutesToSimCard(eq("1"), anyString(), anyInt(), anyInt()))
                 .thenReturn(details);
         String id = details.getId();
 
         mockMvc.perform(post("/api/v1/sim-card/1/minutes")
                 .contentType(MediaType.APPLICATION_JSON_UTF8_VALUE)
-                .content("{\"basePackageId\": 1, \"minutes\": 15, \"daysToLive\": 10}"))
+                .content("{\"basePackageId\": 1, \"addition\": 15, \"daysToLive\": 10}"))
                 .andDo(print())
                 .andExpect(status().isCreated())
                 .andExpect(header().string("Content-Type", MediaType.APPLICATION_JSON_UTF8_VALUE))
-                .andExpect(header().string("Location", "/api/v1/package-of-minutes/" + id))
+                .andExpect(header().string("Location", "/api/v1/packages-of-addition/" + id))
                 .andExpect(content().contentType(MediaType.APPLICATION_JSON_UTF8_VALUE))
                 .andExpect(content().json(mapper.writeValueAsString(details)));
 
-        verify(simCardService).addPackageOfMinutesToSimCard(eq("1"), eq(1L), eq(15), eq(10));
+        verify(simCardService).addPackageOfMinutesToSimCard(eq("1"), eq("1"), eq(15), eq(10));
     }
 }

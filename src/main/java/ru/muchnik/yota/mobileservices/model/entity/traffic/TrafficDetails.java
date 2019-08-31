@@ -1,9 +1,10 @@
-package ru.muchnik.yota.mobileservices.model.entity;
+package ru.muchnik.yota.mobileservices.model.entity.traffic;
 
-import com.fasterxml.jackson.annotation.JsonManagedReference;
 import lombok.Data;
 import lombok.EqualsAndHashCode;
 import lombok.NoArgsConstructor;
+import ru.muchnik.yota.mobileservices.model.entity.IDetails;
+import ru.muchnik.yota.mobileservices.model.entity.SimCard;
 
 import javax.persistence.*;
 import javax.validation.constraints.NotNull;
@@ -16,7 +17,7 @@ import java.util.UUID;
 @Data
 @NoArgsConstructor
 @EqualsAndHashCode(onlyExplicitlyIncluded = true)
-public class MinutesPackageDetails {
+public class TrafficDetails implements IDetails<TrafficPackageCatalog> {
     @Id
     @EqualsAndHashCode.Include
     @Size(max = 36)
@@ -27,17 +28,16 @@ public class MinutesPackageDetails {
     @ManyToOne(cascade = {}, optional = false)
     @NotNull
     @JoinColumn(name = "base_package_id")
-    private PackageOfMinutes basePackage;
+    private TrafficPackageCatalog basePackage;
     /**
      * Reference to package owner sim card
      */
     @ManyToOne(optional = false)
     @NotNull
     @JoinColumn(name = "sim_card_id")
-    @JsonManagedReference
     private SimCard simCard;
     @PositiveOrZero
-    private int minutesLeft;
+    private int gigabytesLeft;
     @NotNull
     @Column(columnDefinition = "TIMESTAMP")
     private LocalDateTime activationDate;
@@ -45,11 +45,21 @@ public class MinutesPackageDetails {
     @Column(columnDefinition = "TIMESTAMP")
     private LocalDateTime expirationDate;
 
-    public MinutesPackageDetails(@NotNull final PackageOfMinutes basePackage, final int minutes, final int daysToLive) {
+    public TrafficDetails(@NotNull final TrafficPackageCatalog basePackage, final int gigabytes, final int daysToLive) {
         LocalDateTime activationDate = LocalDateTime.now();
         this.basePackage = basePackage;
         this.activationDate = activationDate;
-        this.minutesLeft = minutes;
+        this.gigabytesLeft = gigabytes;
         this.expirationDate = activationDate.plusDays(daysToLive);
+    }
+
+    @Override
+    public int getAmountLeft() {
+        return getGigabytesLeft();
+    }
+
+    @Override
+    public void setAmountLeft(final int amountLeft) {
+        setGigabytesLeft(amountLeft);
     }
 }

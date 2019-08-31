@@ -9,12 +9,13 @@ import org.mockito.Mock;
 import org.mockito.junit.MockitoJUnitRunner;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
-import ru.muchnik.yota.mobileservices.model.dto.UnitDTO;
-import ru.muchnik.yota.mobileservices.model.dto.request.AddMinutesToPackageOfMinutesRequestDTO;
-import ru.muchnik.yota.mobileservices.model.entity.MinutesPackageDetails;
+import ru.muchnik.yota.mobileservices.model.dto.ValueDTO;
+import ru.muchnik.yota.mobileservices.model.dto.UpdatePackageRequestDTO;
+import ru.muchnik.yota.mobileservices.model.entity.minutes.MinutesDetails;
 import ru.muchnik.yota.mobileservices.model.entity.SimCard;
-import ru.muchnik.yota.mobileservices.service.MinutesPackageDetailsService;
+import ru.muchnik.yota.mobileservices.service.BaseDetailsService;
 import ru.muchnik.yota.mobileservices.service.SimCardService;
+import ru.muchnik.yota.mobileservices.service.minutes.MinutesDetailsService;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -28,7 +29,7 @@ public class SimCardControllerTest {
     @Mock
     private SimCardService simCardService;
     @Mock
-    private MinutesPackageDetailsService detailsService;
+    private MinutesDetailsService detailsService;
 
     @InjectMocks
     private SimCardController controller;
@@ -36,9 +37,9 @@ public class SimCardControllerTest {
     @Mock
     private SimCard simCard;
     @Mock
-    private MinutesPackageDetails details;
+    private MinutesDetails details;
     @Mock
-    private MinutesPackageDetails details2;
+    private MinutesDetails details2;
 
     @Before
     public void setUp() throws Exception {
@@ -55,57 +56,57 @@ public class SimCardControllerTest {
 
     @Test
     public void getSimCardStatus() {
-        ResponseEntity<UnitDTO<Boolean>> exp = ResponseEntity.ok(new UnitDTO<>(true));
+        ResponseEntity<ValueDTO<Boolean>> exp = ResponseEntity.ok(new ValueDTO<>(true));
         when(simCardService.getSimCardStatus(eq("89992223344"))).thenReturn(true);
 
-        ResponseEntity<UnitDTO<Boolean>> result = controller.getSimCardStatus("89992223344");
+        ResponseEntity<ValueDTO<Boolean>> result = controller.getSimCardStatus("89992223344");
         Assert.assertEquals(exp, result);
     }
 
     @Test
     public void updateSimCardStatus() {
-        controller.updateSimCardStatus("89992223344", new UnitDTO<>(true));
+        controller.updateSimCardStatus("89992223344", new ValueDTO<>(true));
 
         verify(simCardService).updateSimCardStatus(eq("89992223344"), eq(true));
     }
 
     @Test
     public void getSimCardActiveMinutesValue() {
-        List<MinutesPackageDetails> list = new ArrayList<>();
+        List<MinutesDetails> list = new ArrayList<>();
         list.add(details);
         list.add(details2);
         when(details.getMinutesLeft()).thenReturn(2);
         when(details2.getMinutesLeft()).thenReturn(3);
         when(detailsService.getAllActivePackages(eq("89992223344"))).thenReturn(list);
 
-        ResponseEntity<UnitDTO<Integer>> result = controller.getSimCardActiveMinutesTotal("89992223344");
+        ResponseEntity<ValueDTO<Integer>> result = controller.getSimCardActiveMinutesTotal("89992223344");
 
-        ResponseEntity<UnitDTO<Integer>> exp = ResponseEntity.ok(new UnitDTO<>(5));
+        ResponseEntity<ValueDTO<Integer>> exp = ResponseEntity.ok(new ValueDTO<>(5));
         Assert.assertEquals(exp, result);
     }
 
     @Test
     public void getSimCardActiveMinutes() {
-        List<MinutesPackageDetails> list = new ArrayList<>();
+        List<MinutesDetails> list = new ArrayList<>();
         list.add(details);
         list.add(details2);
         when(detailsService.getAllActivePackages(eq("89992223344"))).thenReturn(list);
 
-        ResponseEntity<List<MinutesPackageDetails>> result = controller.getSimCardActivePackagesOfMinutes("89992223344");
+        ResponseEntity<List<MinutesDetails>> result = controller.getSimCardActivePackagesOfMinutes("89992223344");
 
-        ResponseEntity<List<MinutesPackageDetails>> exp = ResponseEntity.ok(list);
+        ResponseEntity<List<MinutesDetails>> exp = ResponseEntity.ok(list);
         Assert.assertEquals(exp, result);
     }
 
     @Test
     public void addSimCardMinutesPackage() {
-        when(simCardService.addPackageOfMinutesToSimCard(eq("89992223344"), eq(1L), eq(2), eq(3)))
+        when(simCardService.addPackageOfMinutesToSimCard(eq("89992223344"), eq("1"), eq(2), eq(3)))
                 .thenReturn(details);
         when(details.getId()).thenReturn("1");
 
-        ResponseEntity<MinutesPackageDetails> result = controller.addPackageOfMinutesToSimCard("89992223344", new AddMinutesToPackageOfMinutesRequestDTO(1L, 2, 3));
+        ResponseEntity<MinutesDetails> result = controller.addPackageOfMinutesToSimCard("89992223344", new UpdatePackageRequestDTO("1", 2, 3));
 
-        verify(simCardService).addPackageOfMinutesToSimCard(eq("89992223344"), eq(1L), eq(2), eq(3));
+        verify(simCardService).addPackageOfMinutesToSimCard(eq("89992223344"), eq("1"), eq(2), eq(3));
         Assert.assertEquals(HttpStatus.CREATED, result.getStatusCode());
     }
 }

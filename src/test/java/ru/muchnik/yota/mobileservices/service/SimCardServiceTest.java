@@ -7,12 +7,13 @@ import org.junit.runner.RunWith;
 import org.mockito.InjectMocks;
 import org.mockito.Mock;
 import org.mockito.junit.MockitoJUnitRunner;
-import ru.muchnik.yota.mobileservices.model.entity.MinutesPackageDetails;
-import ru.muchnik.yota.mobileservices.model.entity.PackageOfMinutes;
+import ru.muchnik.yota.mobileservices.model.entity.minutes.MinutesPackageCatalog;
+import ru.muchnik.yota.mobileservices.model.entity.minutes.MinutesDetails;
 import ru.muchnik.yota.mobileservices.model.entity.SimCard;
 import ru.muchnik.yota.mobileservices.model.exception.NotFoundException;
-import ru.muchnik.yota.mobileservices.repository.MinutesPackageDetailsRepository;
+import ru.muchnik.yota.mobileservices.repository.minutes.MinutesDetailsRepository;
 import ru.muchnik.yota.mobileservices.repository.SimCardRepository;
+import ru.muchnik.yota.mobileservices.service.minutes.MinutesPackageService;
 
 import java.time.LocalDateTime;
 import java.util.ArrayList;
@@ -28,9 +29,9 @@ public class SimCardServiceTest {
     @Mock
     private SimCardRepository simCardRepository;
     @Mock
-    private PackageOfMinutesService packageOfMinutesService;
+    private MinutesPackageService minutesPackageService;
     @Mock
-    private MinutesPackageDetailsRepository detailsRepository;
+    private MinutesDetailsRepository detailsRepository;
 
     @InjectMocks
     private SimCardService service;
@@ -40,7 +41,7 @@ public class SimCardServiceTest {
     private Optional<SimCard> optionalSimCard;
 
     @Mock
-    private PackageOfMinutes basePackage;
+    private MinutesPackageCatalog basePackage;
 
     @Before
     public void setUp() throws Exception {
@@ -73,33 +74,37 @@ public class SimCardServiceTest {
 
     @Test
     public void updateSimCardStatus() {
-        when(simCardRepository.updateStatus(eq(PHONE_NUMBER), eq(false))).thenReturn(1);
-        boolean updated = service.updateSimCardStatus(PHONE_NUMBER, false);
-        verify(simCardRepository).updateStatus(eq(PHONE_NUMBER), eq(false));
-        Assert.assertTrue(updated);
+        SimCard simCard = SimCard.builder()
+                .number(PHONE_NUMBER)
+                .isActive(true)
+                .build();
+        when(simCardRepository.getByNumber(eq(PHONE_NUMBER))).thenReturn(Optional.of(simCard));
+
+        service.updateSimCardStatus(PHONE_NUMBER, false);
+
+        Assert.assertFalse(simCard.isActive());
     }
 
-    @Test
+    @Test (expected = NotFoundException.class)
     public void updateSimCardStatusNotUpdated() {
-        when(simCardRepository.updateStatus(eq(PHONE_NUMBER), eq(false))).thenReturn(0);
-        boolean updated = service.updateSimCardStatus(PHONE_NUMBER, false);
-        verify(simCardRepository).updateStatus(eq(PHONE_NUMBER), eq(false));
-        Assert.assertFalse(updated);
+        when(simCardRepository.getByNumber(eq(PHONE_NUMBER))).thenReturn(Optional.empty());
+
+        service.updateSimCardStatus(PHONE_NUMBER, false);
     }
 
     @Test
     public void addMinutesPackageToSimCard() {
         LocalDateTime plusDays = LocalDateTime.now().plusDays(3);
         when(simCardRepository.getByNumber(eq(PHONE_NUMBER))).thenReturn(optionalSimCard);
-        when(packageOfMinutesService.getPackage(eq(1L))).thenReturn(basePackage);
-        ArrayList<MinutesPackageDetails> list = spy(new ArrayList<>());
-        when(simCard.getMinutesPackageDetails()).thenReturn(list);
+        when(minutesPackageService.getPackage(eq("1"))).thenReturn(basePackage);
+        ArrayList<MinutesDetails> list = spy(new ArrayList<>());
+        when(simCard.getMinutesDetails()).thenReturn(list);
 
-        service.addPackageOfMinutesToSimCard(PHONE_NUMBER, 1L, 2, 3);
+        service.addPackageOfMinutesToSimCard(PHONE_NUMBER, "1", 2, 3);
         LocalDateTime now = LocalDateTime.now();
 
-        verify(list).add(any(MinutesPackageDetails.class));
-        MinutesPackageDetails resultDetails = list.get(0);
+        verify(list).add(any(MinutesDetails.class));
+        MinutesDetails resultDetails = list.get(0);
         Assert.assertEquals(2, resultDetails.getMinutesLeft());
         Assert.assertEquals(simCard, resultDetails.getSimCard());
         Assert.assertEquals(basePackage, resultDetails.getBasePackage());

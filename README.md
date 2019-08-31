@@ -1,5 +1,4 @@
 # Тестовое задание для YOTA
-
 ## Задание
 Сделать простую реализацию сервиса тарификации услуг сотовой связи (минут звонков и гигабайт интернета).
 
@@ -31,11 +30,24 @@
 2. Запустить из IDE или с помощью java -jar app.jar
 
 ## Использование 
- * WebUI для встроенной базы данных: http://localhost:8080/h2-console/
-   * JDBC Url: jdbc:h2:mem:test
-   * User: sa
-   * Password: 
- * API доступно на порту 8080
+1. WebUI для встроенной базы данных: http://localhost:8080/h2-console/
+1.1 JDBC Url: jdbc:h2:mem:test
+1.2. User: sa
+1.3. Password: 
+2. API доступно на порту 8080
+
+| Метод   | Тело запроса            | Адрес                                                       | Описание                          |
+| --------| ----------------------- | ----------------------------------------------------------- | --------------------------------  |
+|  GET    |     пусто               |`localhost:8080/api/v1/sim-card/${номер_телефона}/`                | Получить сим-карту (обьект)       |
+|  GET    |     пусто               |`localhost:8080/api/v1/sim-card/${номер_телефона}/status`          | Статус сим-карты                  |
+|  PUT    |     {"value": <true/false>}    |`localhost:8080/api/v1/sim-card/${номер_телефона}/status`   | Обновить статус сим-карты         |
+|  GET    |     пусто               |`localhost:8080/api/v1/sim-card/${номер_телефона}/minutes/total`   | Количество активных минут         |
+|  GET    |     пусто               |`localhost:8080/api/v1/sim-card/${номер_телефона}/minutes/packages`| Количество активных пакетов минут |
+|  POST   |{"basePackageId": "<id нужного пакета>","addition": <Количество минут>,"daysToLive": "<Время жизни (дней)>"}|`localhost:8080/api/v1/sim-card/${номер_телефона}/minutes`         | Добавить пакет минут к сим-карте  |
+|  GET    |     пусто               |`localhost:8080/api/v1/packages-of-minutes/${id_пакета}`            | Получить базовый пакет минут (обьект)     |
+|  GET    |     пусто               |`localhost:8080/api/v1/packages-of-minutes/`            | Получить все базовые пакеты минут (обьект)     |
+|  POST   |{"name":"<имя_пакета>","type":"<FREE_ROAMING \ FAVORITE_NUMBER>"} | `localhost:8080/api/v1/packages-of-minutes/`                   | Сохранить в базу базовый пакет минут      |
+|  PUT    |{"value": <количество минут (отр или пол)>} |`localhost:8080/api/v1/packages-of-minutes/details/${details_id}`                    | Сохранить в базу базовый пакет минут      |
 
 ## Контакты
     muchnik.ak@gmail.com

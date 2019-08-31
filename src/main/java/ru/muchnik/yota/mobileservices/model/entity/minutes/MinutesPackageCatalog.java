@@ -1,7 +1,8 @@
-package ru.muchnik.yota.mobileservices.model.entity;
+package ru.muchnik.yota.mobileservices.model.entity.minutes;
 
 
 import lombok.*;
+import ru.muchnik.yota.mobileservices.model.entity.IPackageCatalog;
 
 import javax.persistence.Entity;
 import javax.persistence.Enumerated;
@@ -16,23 +17,25 @@ import java.util.UUID;
 @AllArgsConstructor
 @Builder
 @EqualsAndHashCode(onlyExplicitlyIncluded = true)
-public class PackageOfMinutes {
+public class MinutesPackageCatalog implements IPackageCatalog<MinutesPackageCatalog.MinutesPackageType> {
     @Id
     @EqualsAndHashCode.Include
     @Size(max = 36)
     private final String id = UUID.randomUUID().toString();
+
     /**
      * Package business name
      */
     @NotBlank
     private String name;
+
     /**
      * Type, in future may contains relations with other entities that contains package behaviour
      */
     @Enumerated
-    private PackageOfMinutesType type;
+    private MinutesPackageType type;
 
-    public enum PackageOfMinutesType {
+    public enum MinutesPackageType {
         FREE_ROAMING, FAVORITE_NUMBER
     }
 }
