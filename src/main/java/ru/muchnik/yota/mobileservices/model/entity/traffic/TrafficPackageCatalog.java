@@ -17,7 +17,7 @@ import java.util.UUID;
 @AllArgsConstructor
 @Builder
 @EqualsAndHashCode(onlyExplicitlyIncluded = true)
-public class TrafficPackageCatalog implements IPackageCatalog<TrafficPackageCatalog.TrafficPackageType> {
+public class TrafficPackageCatalog implements IPackageCatalog<TrafficPackageCatalog.Type> {
     @Id
     @EqualsAndHashCode.Include
     @Size(max = 36)
@@ -33,9 +33,9 @@ public class TrafficPackageCatalog implements IPackageCatalog<TrafficPackageCata
      * Type, in future may contains relations with other entities that contains package behaviour
      */
     @Enumerated
-    private TrafficPackageType type;
+    private Type type;
 
-    public enum TrafficPackageType {
+    public enum Type {
         FREE_MESSENGER, YOUTUBE
     }
 }

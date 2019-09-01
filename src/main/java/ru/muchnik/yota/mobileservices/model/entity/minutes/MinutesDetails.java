@@ -41,6 +41,7 @@ public class MinutesDetails implements IDetails<MinutesPackageCatalog> {
 
     @PositiveOrZero
     private int minutesLeft;
+
     @NotNull
     @Column(columnDefinition = "TIMESTAMP")
     private LocalDateTime activationDate;

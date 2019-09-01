@@ -1,6 +1,6 @@
 package ru.muchnik.yota.mobileservices.model.entity;
 
-public interface IPackageCatalog<Type> {
+public interface IPackageCatalog<Type extends Enum> {
     String getId();
 
     String getName();

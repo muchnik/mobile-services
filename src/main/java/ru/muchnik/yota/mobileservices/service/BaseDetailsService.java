@@ -12,7 +12,6 @@ import ru.muchnik.yota.mobileservices.repository.BaseDetailsRepository;
 
 import java.time.LocalDateTime;
 import java.util.List;
-import java.util.Optional;
 
 @RequiredArgsConstructor
 public abstract class BaseDetailsService<Type extends IDetails, Repository extends BaseDetailsRepository<Type> & JpaRepository<Type, String>> {
@@ -20,10 +19,9 @@ public abstract class BaseDetailsService<Type extends IDetails, Repository exten
 
     @Transactional(readOnly = true, isolation = Isolation.READ_COMMITTED)
     public Type getDetails(@NonNull final String id) {
-        Optional<Type> detailsOptional = repository.findById(id);
-        if (!detailsOptional.isPresent()) throw new NotFoundException("Details for package of traffic not found");
-        return detailsOptional.get();
+        return repository.findById(id).orElseThrow(() -> new NotFoundException("Details for package is not found!"));
     }
+
     @Transactional(isolation = Isolation.READ_COMMITTED)
     public void updateAmount(@NonNull final String detailsId, final int addition) {
         Type details = getDetails(detailsId);
@@ -32,6 +30,7 @@ public abstract class BaseDetailsService<Type extends IDetails, Repository exten
         amountLeft += addition;
         details.setAmountLeft(amountLeft);
     }
+
     @Transactional(readOnly = true, isolation = Isolation.READ_COMMITTED)
     public List<Type> getAllActivePackages(@NonNull final String number) {
         return repository.findAllActive(number, LocalDateTime.now());
@@ -39,7 +38,7 @@ public abstract class BaseDetailsService<Type extends IDetails, Repository exten
 
     private void doValidate(@NonNull final Type details, final int addition) {
         doValidateExpiration(details);
-        doValidateAdjusting(details, addition);
+        doValidateAddition(details, addition);
     }
 
     private void doValidateExpiration(@NonNull final Type details) {
@@ -48,14 +47,14 @@ public abstract class BaseDetailsService<Type extends IDetails, Repository exten
         LocalDateTime expirationDate = details.getExpirationDate();
 
         if (!activationDate.isBefore(now) || !expirationDate.isAfter(now)) {
-            throw new ValidationException("Package has expired!");
+            throw new ValidationException("Package life time has expired!");
         }
     }
 
-    private void doValidateAdjusting(@NonNull final Type details, final int addition) {
+    private void doValidateAddition(@NonNull final Type details, final int addition) {
         int amountLeft = details.getAmountLeft();
         if (addition < 0 && amountLeft < (-addition)) {
-            throw new ValidationException("Amount in package of addition cannot be decremented! Left:" + amountLeft + " Decrement:" + addition);
+            throw new ValidationException("Amount in package cannot be decremented! Left:" + amountLeft + " Decrement by:" + addition);
         }
     }
 }

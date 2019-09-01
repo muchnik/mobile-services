@@ -48,7 +48,7 @@ public class BaseMinutesPackageServiceTest {
     }
 
     @Test
-    public void getPackageы() {
+    public void getPackages() {
         when(repository.findAll()).thenReturn(Arrays.asList(minutesPackageCatalog, minutesPackageCatalog2));
 
         List<MinutesPackageCatalog> result = service.getPackages();

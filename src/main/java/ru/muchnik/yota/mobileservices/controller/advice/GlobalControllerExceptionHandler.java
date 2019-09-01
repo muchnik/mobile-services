@@ -76,7 +76,7 @@ public class GlobalControllerExceptionHandler extends ResponseEntityExceptionHan
     }
 
     /**
-     * In case of any validation exceptions, occured on any entity
+     * In case of any validation exceptions occurred on any entity
      *
      * @param ex throwed exception
      * @return business {@link ResponseEntity}

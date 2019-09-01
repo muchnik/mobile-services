@@ -22,6 +22,7 @@ public class TrafficDetails implements IDetails<TrafficPackageCatalog> {
     @EqualsAndHashCode.Include
     @Size(max = 36)
     private final String id = UUID.randomUUID().toString();
+
     /**
      * Reference to base package that may (in future) contains more business information
      */
@@ -29,6 +30,7 @@ public class TrafficDetails implements IDetails<TrafficPackageCatalog> {
     @NotNull
     @JoinColumn(name = "base_package_id")
     private TrafficPackageCatalog basePackage;
+
     /**
      * Reference to package owner sim card
      */
@@ -36,11 +38,14 @@ public class TrafficDetails implements IDetails<TrafficPackageCatalog> {
     @NotNull
     @JoinColumn(name = "sim_card_id")
     private SimCard simCard;
+
     @PositiveOrZero
     private int gigabytesLeft;
+
     @NotNull
     @Column(columnDefinition = "TIMESTAMP")
     private LocalDateTime activationDate;
+
     @NotNull
     @Column(columnDefinition = "TIMESTAMP")
     private LocalDateTime expirationDate;

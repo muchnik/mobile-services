@@ -16,7 +16,6 @@ import ru.muchnik.yota.mobileservices.controller.MinutesPackageController;
 import ru.muchnik.yota.mobileservices.model.ErrorResponse;
 import ru.muchnik.yota.mobileservices.model.exception.NotFoundException;
 import ru.muchnik.yota.mobileservices.model.exception.ValidationException;
-import ru.muchnik.yota.mobileservices.service.BaseDetailsService;
 import ru.muchnik.yota.mobileservices.service.minutes.MinutesDetailsService;
 import ru.muchnik.yota.mobileservices.service.minutes.MinutesPackageService;
 

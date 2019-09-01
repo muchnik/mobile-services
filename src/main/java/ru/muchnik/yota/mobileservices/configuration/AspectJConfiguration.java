@@ -5,6 +5,7 @@ import org.springframework.context.annotation.EnableAspectJAutoProxy;
 
 /**
  * Common configuration for aspectj
+ *
  * @apiNote needed to exclude autoconfiguration in test environment
  */
 @Configuration

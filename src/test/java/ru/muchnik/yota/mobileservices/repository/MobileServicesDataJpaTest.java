@@ -10,14 +10,13 @@ import org.springframework.boot.CommandLineRunner;
 import org.springframework.boot.test.autoconfigure.orm.jpa.DataJpaTest;
 import org.springframework.boot.test.mock.mockito.MockBean;
 import org.springframework.test.context.junit4.SpringRunner;
-import ru.muchnik.yota.mobileservices.model.entity.minutes.MinutesPackageCatalog;
-import ru.muchnik.yota.mobileservices.model.entity.minutes.MinutesDetails;
 import ru.muchnik.yota.mobileservices.model.entity.SimCard;
+import ru.muchnik.yota.mobileservices.model.entity.minutes.MinutesDetails;
+import ru.muchnik.yota.mobileservices.model.entity.minutes.MinutesPackageCatalog;
 import ru.muchnik.yota.mobileservices.model.entity.traffic.TrafficDetails;
 import ru.muchnik.yota.mobileservices.model.entity.traffic.TrafficPackageCatalog;
 import ru.muchnik.yota.mobileservices.repository.minutes.MinutesDetailsRepository;
 import ru.muchnik.yota.mobileservices.repository.minutes.MinutesPackageCatalogRepository;
-import ru.muchnik.yota.mobileservices.repository.traffic.TrafficDetailsRepository;
 import ru.muchnik.yota.mobileservices.repository.traffic.TrafficPackageCatalogRepository;
 
 import java.time.LocalDateTime;
@@ -48,12 +47,12 @@ public class MobileServicesDataJpaTest {
     public void setUp() throws Exception {
         MinutesPackageCatalog freeRoaming = MinutesPackageCatalog.builder()
                 .name("FreeRoaming")
-                .type(MinutesPackageCatalog.MinutesPackageType.FREE_ROAMING)
+                .type(MinutesPackageCatalog.Type.FREE_ROAMING)
                 .build();
 
         MinutesPackageCatalog favoriteNumber = MinutesPackageCatalog.builder()
                 .name("FavoriteNumber")
-                .type(MinutesPackageCatalog.MinutesPackageType.FAVORITE_NUMBER)
+                .type(MinutesPackageCatalog.Type.FAVORITE_NUMBER)
                 .build();
 
         MinutesDetails activeFirstDetails = new MinutesDetails(freeRoaming, 300, 30);
@@ -62,7 +61,7 @@ public class MobileServicesDataJpaTest {
 
         TrafficPackageCatalog trafficYoutube = TrafficPackageCatalog.builder()
                 .name("Youtube")
-                .type(TrafficPackageCatalog.TrafficPackageType.YOUTUBE)
+                .type(TrafficPackageCatalog.Type.YOUTUBE)
                 .build();
 
         TrafficDetails trafficDetails = new TrafficDetails(trafficYoutube, 4, 2);

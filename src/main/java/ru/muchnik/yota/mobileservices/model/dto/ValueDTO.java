@@ -5,7 +5,8 @@ import lombok.Data;
 import lombok.NoArgsConstructor;
 
 /**
- * Simple DTO for single value-container
+ * Simple data transfer object for single value-container
+ *
  * @param <Type> type of value
  */
 @Data

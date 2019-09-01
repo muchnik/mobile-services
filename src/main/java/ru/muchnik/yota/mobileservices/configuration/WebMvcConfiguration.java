@@ -5,6 +5,7 @@ import org.springframework.web.servlet.config.annotation.EnableWebMvc;
 
 /**
  * Common configuration for web mvc
+ *
  * @apiNote needed to exclude autoconfiguration in test environment
  */
 @Configuration

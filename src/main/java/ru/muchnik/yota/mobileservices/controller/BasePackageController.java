@@ -11,10 +11,7 @@ import ru.muchnik.yota.mobileservices.repository.BaseDetailsRepository;
 import ru.muchnik.yota.mobileservices.service.BaseDetailsService;
 import ru.muchnik.yota.mobileservices.service.BasePackageService;
 
-import java.net.URI;
-import java.util.HashMap;
 import java.util.List;
-import java.util.Map;
 
 @RequiredArgsConstructor
 public abstract class BasePackageController<Type extends IPackageCatalog,
@@ -38,7 +35,7 @@ public abstract class BasePackageController<Type extends IPackageCatalog,
     public abstract ResponseEntity<Type> savePackage(@RequestBody Type packageToSave);
 
     @PutMapping("/details/{detailsId}")
-    public ResponseEntity<Void> updateAmount(@PathVariable String detailsId, @RequestBody ValueDTO<Integer> input) {
+    public ResponseEntity<Void> updatePackageAmount(@PathVariable String detailsId, @RequestBody ValueDTO<Integer> input) {
         Integer value = input.getValue();
         if (value != 0) {
             detailsService.updateAmount(detailsId, value);

@@ -37,7 +37,7 @@ public class SimCard {
     private boolean isActive;
 
     /**
-     * All {@link MinutesDetails} packages of addition that is attached to this sim card
+     * All {@link MinutesDetails} packages of minutes that is attached to this sim card
      */
     @OneToMany(cascade = CascadeType.ALL, orphanRemoval = true, mappedBy = "simCard", fetch = FetchType.LAZY)
     @NotNull
@@ -46,7 +46,7 @@ public class SimCard {
     private List<MinutesDetails> minutesDetails;
 
     /**
-     * All {@link MinutesDetails} packages of addition that is attached to this sim card
+     * All {@link MinutesDetails} packages of traffic that is attached to this sim card
      */
     @OneToMany(cascade = CascadeType.ALL, orphanRemoval = true, mappedBy = "simCard", fetch = FetchType.LAZY)
     @NotNull

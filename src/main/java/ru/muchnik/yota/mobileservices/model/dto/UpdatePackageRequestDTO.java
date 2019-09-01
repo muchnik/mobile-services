@@ -4,6 +4,9 @@ import lombok.AllArgsConstructor;
 import lombok.Data;
 import lombok.NoArgsConstructor;
 
+/**
+ * Data transfer object for update package operation
+ */
 @Data
 @AllArgsConstructor
 @NoArgsConstructor

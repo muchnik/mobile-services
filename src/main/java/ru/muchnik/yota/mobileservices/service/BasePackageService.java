@@ -9,7 +9,6 @@ import ru.muchnik.yota.mobileservices.model.entity.IPackageCatalog;
 import ru.muchnik.yota.mobileservices.model.exception.NotFoundException;
 
 import java.util.List;
-import java.util.Optional;
 
 @RequiredArgsConstructor
 public abstract class BasePackageService<Type extends IPackageCatalog, Repository extends JpaRepository<Type, String>> {
@@ -17,9 +16,7 @@ public abstract class BasePackageService<Type extends IPackageCatalog, Repositor
 
     @Transactional(readOnly = true, isolation = Isolation.READ_COMMITTED)
     public Type getPackage(@NonNull final String id) {
-        Optional<Type> optionalPackage = repository.findById(id);
-        if (!optionalPackage.isPresent()) throw new NotFoundException("Package not found");
-        return optionalPackage.get();
+        return repository.findById(id).orElseThrow(() -> new NotFoundException("Package is not found!"));
     }
 
     @Transactional(readOnly = true, isolation = Isolation.READ_COMMITTED)

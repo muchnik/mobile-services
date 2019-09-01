@@ -17,7 +17,7 @@ import java.util.UUID;
 @AllArgsConstructor
 @Builder
 @EqualsAndHashCode(onlyExplicitlyIncluded = true)
-public class MinutesPackageCatalog implements IPackageCatalog<MinutesPackageCatalog.MinutesPackageType> {
+public class MinutesPackageCatalog implements IPackageCatalog<MinutesPackageCatalog.Type> {
     @Id
     @EqualsAndHashCode.Include
     @Size(max = 36)
@@ -33,9 +33,9 @@ public class MinutesPackageCatalog implements IPackageCatalog<MinutesPackageCata
      * Type, in future may contains relations with other entities that contains package behaviour
      */
     @Enumerated
-    private MinutesPackageType type;
+    private Type type;
 
-    public enum MinutesPackageType {
+    public enum Type {
         FREE_ROAMING, FAVORITE_NUMBER
     }
 }

@@ -6,7 +6,6 @@ import org.springframework.stereotype.Controller;
 import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
-import ru.muchnik.yota.mobileservices.model.dto.CreatePackageDTO;
 import ru.muchnik.yota.mobileservices.model.entity.traffic.TrafficDetails;
 import ru.muchnik.yota.mobileservices.model.entity.traffic.TrafficPackageCatalog;
 import ru.muchnik.yota.mobileservices.service.traffic.TrafficDetailsService;
@@ -16,7 +15,7 @@ import java.net.URI;
 
 @Controller
 @RequestMapping(value = "api/v1/traffic-packages/", consumes = MediaType.APPLICATION_JSON_UTF8_VALUE, produces = MediaType.APPLICATION_JSON_UTF8_VALUE)
-public class TrafficPackageController extends BasePackageController<TrafficPackageCatalog, TrafficDetails, TrafficPackageService, TrafficDetailsService>  {
+public class TrafficPackageController extends BasePackageController<TrafficPackageCatalog, TrafficDetails, TrafficPackageService, TrafficDetailsService> {
     public TrafficPackageController(final TrafficPackageService packageService, final TrafficDetailsService detailsService) {
         super(packageService, detailsService);
     }

@@ -73,18 +73,18 @@ public class MinutesPackageCatalogControllerTest {
 
         ResponseEntity<MinutesPackageCatalog> result = controller.savePackage(MinutesPackageCatalog.builder()
                 .name("name")
-                .type(MinutesPackageCatalog.MinutesPackageType.FAVORITE_NUMBER)
+                .type(MinutesPackageCatalog.Type.FAVORITE_NUMBER)
                 .build());
 
         MinutesPackageCatalog captorValue = captor.getValue();
         Assert.assertEquals("name", captorValue.getName());
-        Assert.assertEquals(MinutesPackageCatalog.MinutesPackageType.FAVORITE_NUMBER, captorValue.getType());
+        Assert.assertEquals(MinutesPackageCatalog.Type.FAVORITE_NUMBER, captorValue.getType());
         Assert.assertEquals(ResponseEntity.created(URI.create("/api/v1/packages-of-minutes/2")).body(minutesPackageCatalog), result);
     }
 
     @Test
     public void updateMinutes() {
-        ResponseEntity<Void> voidResponseEntity = controller.updateAmount("1", new ValueDTO<>(2));
+        ResponseEntity<Void> voidResponseEntity = controller.updatePackageAmount("1", new ValueDTO<>(2));
 
         verify(detailsService).updateAmount(eq("1"), eq(2));
         Assert.assertEquals(200, voidResponseEntity.getStatusCodeValue());
@@ -92,7 +92,7 @@ public class MinutesPackageCatalogControllerTest {
 
     @Test
     public void updateMinutesBy0() {
-        ResponseEntity<Void> voidResponseEntity = controller.updateAmount("1", new ValueDTO<>(0));
+        ResponseEntity<Void> voidResponseEntity = controller.updatePackageAmount("1", new ValueDTO<>(0));
 
         verifyZeroInteractions(detailsService);
         Assert.assertEquals(200, voidResponseEntity.getStatusCodeValue());

@@ -14,7 +14,6 @@ import org.springframework.boot.test.mock.mockito.MockBean;
 import org.springframework.http.MediaType;
 import org.springframework.test.context.junit4.SpringRunner;
 import org.springframework.test.web.servlet.MockMvc;
-import ru.muchnik.yota.mobileservices.model.entity.minutes.MinutesPackageCatalog;
 import ru.muchnik.yota.mobileservices.model.entity.traffic.TrafficPackageCatalog;
 import ru.muchnik.yota.mobileservices.service.traffic.TrafficDetailsService;
 import ru.muchnik.yota.mobileservices.service.traffic.TrafficPackageService;
@@ -61,7 +60,7 @@ public class TrafficPackageCatalogControllerContextTest {
     public void savePackage() throws Exception {
         TrafficPackageCatalog mp = TrafficPackageCatalog.builder()
                 .name("name")
-                .type(TrafficPackageCatalog.TrafficPackageType.YOUTUBE)
+                .type(TrafficPackageCatalog.Type.YOUTUBE)
                 .build();
         when(packageService.savePackage(any())).thenReturn(mp);
 
@@ -78,7 +77,7 @@ public class TrafficPackageCatalogControllerContextTest {
         verify(packageService).savePackage(captor.capture());
         TrafficPackageCatalog captorValue = captor.getValue();
         Assert.assertEquals("name", captorValue.getName());
-        Assert.assertEquals(TrafficPackageCatalog.TrafficPackageType.YOUTUBE, captorValue.getType());
+        Assert.assertEquals(TrafficPackageCatalog.Type.YOUTUBE, captorValue.getType());
     }
 
     @Test

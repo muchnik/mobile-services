@@ -4,19 +4,22 @@ import org.springframework.boot.CommandLineRunner;
 import org.springframework.boot.SpringApplication;
 import org.springframework.boot.autoconfigure.SpringBootApplication;
 import org.springframework.context.annotation.Bean;
-import ru.muchnik.yota.mobileservices.model.entity.minutes.MinutesPackageCatalog;
-import ru.muchnik.yota.mobileservices.model.entity.minutes.MinutesDetails;
 import ru.muchnik.yota.mobileservices.model.entity.SimCard;
+import ru.muchnik.yota.mobileservices.model.entity.minutes.MinutesDetails;
+import ru.muchnik.yota.mobileservices.model.entity.minutes.MinutesPackageCatalog;
 import ru.muchnik.yota.mobileservices.model.entity.traffic.TrafficDetails;
 import ru.muchnik.yota.mobileservices.model.entity.traffic.TrafficPackageCatalog;
-import ru.muchnik.yota.mobileservices.repository.minutes.MinutesPackageCatalogRepository;
 import ru.muchnik.yota.mobileservices.repository.SimCardRepository;
+import ru.muchnik.yota.mobileservices.repository.minutes.MinutesPackageCatalogRepository;
 import ru.muchnik.yota.mobileservices.repository.traffic.TrafficPackageCatalogRepository;
 
 import java.util.Arrays;
 
 /**
- * Application entry point
+ * Application for "YOTA" test task, see readme.md for more information
+ *
+ * @author Muchnik Andrey <b>muchnik.ak@gmail.com</b>
+ * @since 01.09.2019
  */
 @SpringBootApplication
 public class MobileServicesApplication {
@@ -34,12 +37,12 @@ public class MobileServicesApplication {
         return args -> {
             MinutesPackageCatalog freeRoaming = MinutesPackageCatalog.builder()
                     .name("FreeRoaming")
-                    .type(MinutesPackageCatalog.MinutesPackageType.FREE_ROAMING)
+                    .type(MinutesPackageCatalog.Type.FREE_ROAMING)
                     .build();
 
             MinutesPackageCatalog favoriteNumber = MinutesPackageCatalog.builder()
                     .name("FavoriteNumber")
-                    .type(MinutesPackageCatalog.MinutesPackageType.FAVORITE_NUMBER)
+                    .type(MinutesPackageCatalog.Type.FAVORITE_NUMBER)
                     .build();
 
             MinutesDetails packageDetails = new MinutesDetails(freeRoaming, 300, 30);
@@ -48,7 +51,7 @@ public class MobileServicesApplication {
 
             TrafficPackageCatalog trafficYoutube = TrafficPackageCatalog.builder()
                     .name("Youtube")
-                    .type(TrafficPackageCatalog.TrafficPackageType.YOUTUBE)
+                    .type(TrafficPackageCatalog.Type.YOUTUBE)
                     .build();
 
             TrafficDetails trafficDetails = new TrafficDetails(trafficYoutube, 4, 2);

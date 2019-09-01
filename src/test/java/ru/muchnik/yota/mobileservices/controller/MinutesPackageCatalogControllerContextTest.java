@@ -15,7 +15,6 @@ import org.springframework.http.MediaType;
 import org.springframework.test.context.junit4.SpringRunner;
 import org.springframework.test.web.servlet.MockMvc;
 import ru.muchnik.yota.mobileservices.model.entity.minutes.MinutesPackageCatalog;
-import ru.muchnik.yota.mobileservices.service.BaseDetailsService;
 import ru.muchnik.yota.mobileservices.service.minutes.MinutesDetailsService;
 import ru.muchnik.yota.mobileservices.service.minutes.MinutesPackageService;
 
@@ -61,7 +60,7 @@ public class MinutesPackageCatalogControllerContextTest {
     public void savePackage() throws Exception {
         MinutesPackageCatalog mp = MinutesPackageCatalog.builder()
                 .name("name")
-                .type(MinutesPackageCatalog.MinutesPackageType.FAVORITE_NUMBER)
+                .type(MinutesPackageCatalog.Type.FAVORITE_NUMBER)
                 .build();
         when(packageService.savePackage(any())).thenReturn(mp);
 
@@ -78,7 +77,7 @@ public class MinutesPackageCatalogControllerContextTest {
         verify(packageService).savePackage(captor.capture());
         MinutesPackageCatalog captorValue = captor.getValue();
         Assert.assertEquals("name", captorValue.getName());
-        Assert.assertEquals(MinutesPackageCatalog.MinutesPackageType.FAVORITE_NUMBER, captorValue.getType());
+        Assert.assertEquals(MinutesPackageCatalog.Type.FAVORITE_NUMBER, captorValue.getType());
     }
 
     @Test
