@@ -25,10 +25,12 @@
 ## Заметки
 1. При старте приложения база наполняется тестовыми данными
 2. Используется Java 8
+3. В проекте настроены две системы сборки: Maven & Gradle
 
 ## Запуск
 1. Скомпилировать проект (включить Annotation Processor для Lombok и поставить Lombok Plugin для IDEA)
-2. Запустить из IDE через MobileServicesApplication#main или после сборки из target с помощью java -jar mobile-services-1.0.jar
+2. Запустить из IDE через MobileServicesApplication#main или после сборки Gradle bootJar из build/libs с помощью java -jar mobile-services-1.0.jar
+2. Запустить из IDE через MobileServicesApplication#main или после сборки Maven package из target с помощью java -jar mobile-services-1.0.jar
 
 ## Использование 
 - WebUI для встроенной базы данных: http://localhost:8080/h2-console/
