@@ -24,18 +24,18 @@
 
 ## Заметки
 1. При старте приложения база наполняется тестовыми данными
+2. Используется Java 8
 
 ## Запуск
 1. Скомпилировать проект (включить Annotation Processor для Lombok и поставить Lombok Plugin для IDEA)
 2. Запустить из IDE через MobileServicesApplication#main или после сборки из target с помощью java -jar mobile-services-1.0.jar
 
 ## Использование 
-1. WebUI для встроенной базы данных: http://localhost:8080/h2-console/
-JDBC Url: jdbc:h2:mem:test
-User: sa
-Password: 
-
-2. API доступно на порту 8080
+- WebUI для встроенной базы данных: http://localhost:8080/h2-console/
+    - JDBC Url: jdbc:h2:mem:test
+    - User: sa
+    - Password: 
+- API доступно на порту 8080
 
 | Метод   | Тело запроса            | Адрес                                                       | Описание                          |
 | --------| ----------------------- | ----------------------------------------------------------- | --------------------------------  |

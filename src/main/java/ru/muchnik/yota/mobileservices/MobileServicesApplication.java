@@ -16,6 +16,7 @@ import ru.muchnik.yota.mobileservices.repository.traffic.TrafficPackageCatalogRe
 import java.util.Arrays;
 
 /**
+ * Basic CRUD service that allows to work with mobile phone services (like internet traffic / minutes)
  * Application for "YOTA" test task, see readme.md for more information
  *
  * @author Muchnik Andrey <b>muchnik.ak@gmail.com</b>

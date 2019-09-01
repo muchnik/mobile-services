@@ -24,17 +24,17 @@ public class SimCardService {
 
     @Transactional(readOnly = true, isolation = Isolation.READ_COMMITTED)
     public SimCard getSimCard(@NonNull final String number) {
-        return simCardRepository.getByNumber(number).orElseThrow(() -> new NotFoundException("Sim Card is not found!"));
+        return doGetSimCard(number);
     }
 
     @Transactional(readOnly = true, isolation = Isolation.READ_COMMITTED)
     public boolean getSimCardStatus(@NonNull final String number) {
-        return getSimCard(number).isActive();
+        return doGetSimCard(number).isActive();
     }
 
     @Transactional(isolation = Isolation.READ_COMMITTED)
     public SimCard updateSimCardStatus(@NonNull final String number, final boolean status) {
-        SimCard simCard = getSimCard(number);
+        SimCard simCard = doGetSimCard(number);
         simCard.setActive(status);
         return simCard;
     }
@@ -52,7 +52,7 @@ public class SimCardService {
                                                        @NonNull final String basePackageId,
                                                        final int minutes,
                                                        final int daysToLive) {
-        final SimCard simCard = getSimCard(number);
+        final SimCard simCard = doGetSimCard(number);
         final MinutesPackageCatalog basePackage = minutesPackageService.getPackage(basePackageId);
         final MinutesDetails details = new MinutesDetails(basePackage, minutes, daysToLive);
         details.setSimCard(simCard);
@@ -73,11 +73,15 @@ public class SimCardService {
                                                      @NonNull final String basePackageId,
                                                      final int traffic,
                                                      final int daysToLive) {
-        final SimCard simCard = getSimCard(number);
+        final SimCard simCard = doGetSimCard(number);
         final TrafficPackageCatalog basePackage = trafficPackageService.getPackage(basePackageId);
         final TrafficDetails details = new TrafficDetails(basePackage, traffic, daysToLive);
         details.setSimCard(simCard);
         simCard.getTrafficDetails().add(details);
         return details;
+    }
+
+    private SimCard doGetSimCard(@NonNull final String number) {
+        return simCardRepository.getByNumber(number).orElseThrow(() -> new NotFoundException("Sim Card is not found!"));
     }
 }

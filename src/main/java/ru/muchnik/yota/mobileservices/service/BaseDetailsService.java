@@ -19,21 +19,29 @@ public abstract class BaseDetailsService<Type extends IDetails, Repository exten
 
     @Transactional(readOnly = true, isolation = Isolation.READ_COMMITTED)
     public Type getDetails(@NonNull final String id) {
-        return repository.findById(id).orElseThrow(() -> new NotFoundException("Details for package is not found!"));
+        return doGetDetails(id);
     }
 
     @Transactional(isolation = Isolation.READ_COMMITTED)
     public void updateAmount(@NonNull final String detailsId, final int addition) {
-        Type details = getDetails(detailsId);
+        Type details = doGetDetails(detailsId);
         doValidate(details, addition);
-        int amountLeft = details.getAmountLeft();
-        amountLeft += addition;
-        details.setAmountLeft(amountLeft);
+        doUpdateAmount(addition, details);
     }
 
     @Transactional(readOnly = true, isolation = Isolation.READ_COMMITTED)
     public List<Type> getAllActivePackages(@NonNull final String number) {
         return repository.findAllActive(number, LocalDateTime.now());
+    }
+
+    private Type doGetDetails(@NonNull final String id) {
+        return repository.findById(id).orElseThrow(() -> new NotFoundException("Details for package is not found!"));
+    }
+
+    private void doUpdateAmount(final int addition, final Type details) {
+        int amountLeft = details.getAmountLeft();
+        amountLeft += addition;
+        details.setAmountLeft(amountLeft);
     }
 
     private void doValidate(@NonNull final Type details, final int addition) {
